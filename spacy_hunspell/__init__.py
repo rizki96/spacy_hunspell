@@ -35,6 +35,7 @@ class spaCyHunSpell(object):
 
         Token.set_extension('hunspell_spell', default=None)
         Token.set_extension('hunspell_suggest', getter=self.get_suggestion)
+        Token.set_extension('hunspell_stem', getter=self.get_stem)
 
     def __call__(self, doc):
         for token in doc:
@@ -53,3 +54,12 @@ class spaCyHunSpell(object):
         except UnicodeEncodeError:
             suggestions = []
         return suggestions
+
+    def get_stem(self, token):
+        try:
+            stem = self.hobj.stem(token.text)
+        except UnicodeEncodeError:
+            stem = []
+        if not stem:
+            return [token.text]
+        return [s.decode() for s in stem]
